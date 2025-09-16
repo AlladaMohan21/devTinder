@@ -1,7 +1,10 @@
 const express=require("express");
 
 const app=express();
-app.get("/user",(req,res)=>{
+//this will handle get calls only
+app.get("/user/:usedId",(req,res)=>{
+    // console.log(req.query);
+    console.log(req.params);
 res.send({firstname:"allada",lastname:"Mohan"})
 });
 

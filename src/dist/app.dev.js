@@ -2,8 +2,11 @@
 
 var express = require("express");
 
-var app = express();
-app.get("/user", function (req, res) {
+var app = express(); //this will handle get calls only
+
+app.get("/user/:usedId", function (req, res) {
+  // console.log(req.query);
+  console.log(req.params);
   res.send({
     firstname: "allada",
     lastname: "Mohan"
