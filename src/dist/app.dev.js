@@ -3,14 +3,22 @@
 var express = require("express");
 
 var app = express();
-app.use("/hello", function (req, res) {
-  res.send("hello hello helo");
+app.get("/user", function (req, res) {
+  res.send({
+    firstname: "allada",
+    lastname: "Mohan"
+  });
 });
-app.use("/", function (req, res) {
-  res.send("Hello from the  ");
+app.post("/user", function (req, res) {
+  console.log("Save Data to the Database");
+  res.send("data saved to the DATABASE");
 });
+app["delete"]("/user", function (req, res) {
+  res.send("data Deleted Succesfully!!");
+}); //this will handle all the http methods calls to /test
+
 app.use("/test", function (req, res) {
-  res.send("Hello from the server");
+  res.send("Allada Mohan ");
 });
 app.listen(7777, function () {
   console.log("server is ready to listen");

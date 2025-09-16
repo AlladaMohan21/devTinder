@@ -1,17 +1,22 @@
 const express=require("express");
 
 const app=express();
-app.use("/hello",(req,res)=>{
-    res.send("hello hello helo")
+app.get("/user",(req,res)=>{
+res.send({firstname:"allada",lastname:"Mohan"})
+});
 
+app.post("/user",(req,res)=>{
+    console.log("Save Data to the Database")
+res.send("data saved to the DATABASE");
+});
+app.delete("/user",(req,res)=>{
+    res.send("data Deleted Succesfully!!");
 })
 
-app.use("/",(req,res)=>{
-    res.send("Hello from the  ")
-
-})
+//this will handle all the http methods calls to /test
 app.use("/test",(req,res)=>{
-    res.send("Hello from the server")
+    res.send("Allada Mohan ")
+
 })
 
 app.listen(7777,()=>{
