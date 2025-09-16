@@ -28,12 +28,24 @@ var _require = require("./middlewares/auth"),
     adminAuth = _require.adminAuth,
     userAuth = _require.userAuth;
 
+var _require2 = require("console"),
+    error = _require2.error;
+
 app.use("/admin", adminAuth);
 app.post("/user/login", function (req, res) {
   res.send("User logged in successfully!");
 });
 app.get("/user/data", userAuth, function (req, res) {
-  res.send("User Data Sent");
+  // try{
+  throw new error("xyzz");
+  res.send("User Data Sent"); // }catch(err){
+  //res.status(500).send("something went wrong");
+} //}
+);
+app.use("/", function (err, req, res, next) {
+  if (err) {
+    res.status(500).send("something went wrong2");
+  }
 });
 app.get("/admin/getAllData", function (req, res) {
   res.send("All Data Sent");

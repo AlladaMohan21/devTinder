@@ -14,7 +14,7 @@ var adminAuth = function adminAuth(req, res, next) {
 
 var userAuth = function userAuth(req, res, next) {
   console.log("User auth is getting checked!!");
-  var token = "xyzabc";
+  var token = "xyz";
   var isAdminAuthorized = token === "xyz";
 
   if (!isAdminAuthorized) {

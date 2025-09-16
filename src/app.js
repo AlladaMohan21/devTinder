@@ -32,6 +32,7 @@ app.get(
   }
 );
 const { adminAuth, userAuth } = require("./middlewares/auth");
+const { error } = require("console");
 
 app.use("/admin", adminAuth);
 
@@ -39,9 +40,24 @@ app.post("/user/login", (req, res) => {
   res.send("User logged in successfully!");
 });
 
+
 app.get("/user/data", userAuth, (req, res) => {
-  res.send("User Data Sent");
-});
+    // try{
+    throw new error("xyzz");
+       res.send("User Data Sent");
+
+
+    // }catch(err){
+        //res.status(500).send("something went wrong");
+    }
+//}
+);
+
+app.use("/",(err,req,res,next)=>{
+    if(err){
+        res.status(500).send("something went wrong2");
+    }
+})
 
 app.get("/admin/getAllData", (req, res) => {
   res.send("All Data Sent");
