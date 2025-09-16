@@ -2,14 +2,7 @@
 
 var express = require("express");
 
-var app = express();
-app.get("/user/:userId/:name/:password", function (req, res) {
-  console.log(req.params);
-  res.send({
-    firstName: "Akshay",
-    lastName: "Saini"
-  });
-}); //app.use("/route", rH, [rH2, rH3], rH4, rh5);
+var app = express(); //app.use("/route", rH, [rH2, rH3], rH4, rh5);
 
 app.get("/user", function (req, res, next) {
   console.log("Handling the route user!!");
@@ -29,6 +22,24 @@ app.get("/user", function (req, res, next) {
 }, function (req, res, next) {
   console.log("Handling the route user 5!!");
   res.send("5th Response!!");
+});
+
+var _require = require("./middlewares/auth"),
+    adminAuth = _require.adminAuth,
+    userAuth = _require.userAuth;
+
+app.use("/admin", adminAuth);
+app.post("/user/login", function (req, res) {
+  res.send("User logged in successfully!");
+});
+app.get("/user/data", userAuth, function (req, res) {
+  res.send("User Data Sent");
+});
+app.get("/admin/getAllData", function (req, res) {
+  res.send("All Data Sent");
+});
+app.get("/admin/deleteUser", function (req, res) {
+  res.send("Deleted a user");
 });
 app.listen(7777, function () {
   console.log("Server is successfully listening on port 7777...");
