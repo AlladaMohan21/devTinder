@@ -2,58 +2,52 @@
 
 var express = require("express");
 
-var app = express(); //app.use("/route", rH, [rH2, rH3], rH4, rh5);
+var _require = require("./config/database"),
+    connectDb = _require.connectDb;
 
-app.get("/user", function (req, res, next) {
-  console.log("Handling the route user!!");
-  next();
-}, function (req, res, next) {
-  console.log("Handling the route user 2!!"); // res.send("2nd Response!!");
+var User = require("./models/user");
 
-  next();
-}, function (req, res, next) {
-  console.log("Handling the route user 3!!"); // res.send("3rd Response!!");
+var app = express();
+app.post("/signup", function _callee(req, res) {
+  var user;
+  return regeneratorRuntime.async(function _callee$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          _context.prev = 0;
+          user = new User({
+            firstname: "amrutha",
+            lastName: "roshni",
+            emailId: "amrutha21@gmail.com",
+            password: "1432",
+            gender: "female"
+          });
+          _context.next = 4;
+          return regeneratorRuntime.awrap(user.save());
 
-  next();
-}, function (req, res, next) {
-  console.log("Handling the route user 4!!"); // res.send("4th Response!!");
+        case 4:
+          res.send("data added successfully");
+          _context.next = 10;
+          break;
 
-  next();
-}, function (req, res, next) {
-  console.log("Handling the route user 5!!");
-  res.send("5th Response!!");
+        case 7:
+          _context.prev = 7;
+          _context.t0 = _context["catch"](0);
+          res.status(400).send("Error Saving data" + _context.t0.message);
+
+        case 10:
+        case "end":
+          return _context.stop();
+      }
+    }
+  }, null, null, [[0, 7]]);
 });
-
-var _require = require("./middlewares/auth"),
-    adminAuth = _require.adminAuth,
-    userAuth = _require.userAuth;
-
-var _require2 = require("console"),
-    error = _require2.error;
-
-app.use("/admin", adminAuth);
-app.post("/user/login", function (req, res) {
-  res.send("User logged in successfully!");
-});
-app.get("/user/data", userAuth, function (req, res) {
-  // try{
-  throw new error("xyzz");
-  res.send("User Data Sent"); // }catch(err){
-  //res.status(500).send("something went wrong");
-} //}
-);
-app.use("/", function (err, req, res, next) {
-  if (err) {
-    res.status(500).send("something went wrong2");
-  }
-});
-app.get("/admin/getAllData", function (req, res) {
-  res.send("All Data Sent");
-});
-app.get("/admin/deleteUser", function (req, res) {
-  res.send("Deleted a user");
-});
-app.listen(7777, function () {
-  console.log("Server is successfully listening on port 7777...");
+connectDb().then(function () {
+  console.log("Database Connection Established!");
+  app.listen(7777, function () {
+    console.log("Server is successfully listening on port 7777...");
+  });
+})["catch"](function (err) {
+  console.error("Database Cannot be connected");
 });
 //# sourceMappingURL=app.dev.js.map
