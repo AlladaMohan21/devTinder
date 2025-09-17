@@ -2,12 +2,30 @@ const express = require("express");
 const connectDB = require("./config/database");
 const app = express();
 const User = require("./models/user");
+const {validationDatabase}=require("./utils/validation")
+const bcrypt=require("bcrypt");
 
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
+//validate user 
+validationDatabase(req);
+
+//encrypt password
+const{firstName,lastName,emailId,password}=req.body;
+  const existingUser = await User.findOne({ emailId });
+    if (existingUser) {
+      return res.status(400).send("Email already exists");
+    }
+const validatePass=await bcrypt.hash(password,10);
+console.log(validatePass);
   //   Creating a new instance of the User model
-  const user = new User(req.body);
+  const user = new User({
+    firstName,
+    lastName,
+    password:validatePass,
+    emailId
+  });
 
   try {
     await user.save();

@@ -8,45 +8,82 @@ var app = express();
 
 var User = require("./models/user");
 
+var _require = require("./utils/validation"),
+    validationDatabase = _require.validationDatabase;
+
+var bcrypt = require("bcrypt");
+
 app.use(express.json());
 app.post("/signup", function _callee(req, res) {
-  var user;
+  var _req$body, firstName, lastName, emailId, password, existingUser, validatePass, user;
+
   return regeneratorRuntime.async(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          //   Creating a new instance of the User model
-          user = new User(req.body);
-          _context.prev = 1;
+          //validate user 
+          validationDatabase(req); //encrypt password
+
+          _req$body = req.body, firstName = _req$body.firstName, lastName = _req$body.lastName, emailId = _req$body.emailId, password = _req$body.password;
           _context.next = 4;
-          return regeneratorRuntime.awrap(user.save());
+          return regeneratorRuntime.awrap(User.findOne({
+            emailId: emailId
+          }));
 
         case 4:
-          runValidators = true;
-          res.send("User Added successfully!");
-          _context.next = 13;
-          break;
+          existingUser = _context.sent;
 
-        case 8:
-          _context.prev = 8;
-          _context.t0 = _context["catch"](1);
-
-          if (!(_context.t0.code === 11000)) {
-            _context.next = 12;
+          if (!existingUser) {
+            _context.next = 7;
             break;
           }
 
           return _context.abrupt("return", res.status(400).send("Email already exists"));
 
-        case 12:
+        case 7:
+          _context.next = 9;
+          return regeneratorRuntime.awrap(bcrypt.hash(password, 10));
+
+        case 9:
+          validatePass = _context.sent;
+          console.log(validatePass); //   Creating a new instance of the User model
+
+          user = new User({
+            firstName: firstName,
+            lastName: lastName,
+            password: validatePass,
+            emailId: emailId
+          });
+          _context.prev = 12;
+          _context.next = 15;
+          return regeneratorRuntime.awrap(user.save());
+
+        case 15:
+          runValidators = true;
+          res.send("User Added successfully!");
+          _context.next = 24;
+          break;
+
+        case 19:
+          _context.prev = 19;
+          _context.t0 = _context["catch"](12);
+
+          if (!(_context.t0.code === 11000)) {
+            _context.next = 23;
+            break;
+          }
+
+          return _context.abrupt("return", res.status(400).send("Email already exists"));
+
+        case 23:
           res.status(400).send("Error saving user: " + _context.t0.message);
 
-        case 13:
+        case 24:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[1, 8]]);
+  }, null, null, [[12, 19]]);
 }); // Get user by email
 
 app.get("/user", function _callee2(req, res) {
