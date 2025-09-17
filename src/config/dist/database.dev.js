@@ -18,7 +18,5 @@ var connectDb = function connectDb() {
   });
 };
 
-module.exports = {
-  connectDb: connectDb
-};
+module.exports = connectDb;
 //# sourceMappingURL=database.dev.js.map

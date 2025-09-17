@@ -5,4 +5,4 @@ await mongoose.connect("mongodb+srv://alladamohan:%40Mohan123@namastedev.zdkk2yu
 );
 
 }
-module.exports={connectDb}
+module.exports=connectDb;
