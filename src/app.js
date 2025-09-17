@@ -39,6 +39,25 @@ if (err.code === 11000) {
   }
 });
 
+app.post("/login",async (req,res)=>{
+const {emailId,password}=req.body;
+try{
+const user=await User.findOne({emailId:emailId});
+if(!user){
+    throw new Error("Invalid Credentials")
+}
+
+const isPasswordValid=await bcrypt.compare(password,user.password);
+if(isPasswordValid){
+    res.send("Login Successfull..")
+}else{
+    throw new error("Invalid Credentials")
+}
+}catch(err){
+    res.status(400).send("invalid Credentials "+ err.message);
+}
+
+})
 // Get user by email
 app.get("/user", async (req, res) => {
   const userEmail = req.body.emailId;
