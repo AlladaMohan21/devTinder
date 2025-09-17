@@ -1,4 +1,5 @@
  const mongoose=require("mongoose");
+ const validator=require("validator");
 
  
 const userSchema = new mongoose.Schema(
@@ -8,20 +9,33 @@ const userSchema = new mongoose.Schema(
       required: true,
       minLength: 4,
       maxLength: 50,
+      trim:true
     },
     lastName: {
       type: String,
+      trim:true,
+      required:true
     },
     emailId: {
-      type: String,
-      lowercase: true,
-      required: true,
-      unique: true,
-      trim: true,
+        type: String,
+    required: [true, "Email is required"],
+    unique: true,
+    lowercase: true,
+    validate(value){
+        if(!validator.isEmail(value)){
+            throw new Error("Invalid email"+value);
+        }
+    }
     },
     password: {
       type: String,
-      required: true,
+    required: [true, "Password is required"],
+    minlength: [6, "Password must be at least 6 characters"],
+    validate(value){
+        if(!validator.isStrongPassword(value)){
+            throw new Error("Your password is weak.."+value);
+        }
+    }
     },
     age: {
       type: Number,
@@ -38,29 +52,20 @@ const userSchema = new mongoose.Schema(
     photoUrl: {
       type: String,
       default: "https://geographyandyou.com/images/user-profile.png",
+      validate(value){
+        if(!validator.isURL(value)){
+            throw new Error("Invalid url"+value);
+        }
+      }
     },
     about: {
       type: String,
       default: "This is a default about of the user!",
+      maxlength: [200, "About section cannot exceed 200 characters"]
     },
     skills: {
       type: [String],
-    },
-  lastName: {
-    type: String,
-  },
-  emailId: {
-    type: String,
-  },
-  password: {
-    type: String,
-  },
-  age: {
-    type: Number,
-  },
-  gender: {
-    type: String,
-  },
+    }
 },{
     timestamps: true,
   })

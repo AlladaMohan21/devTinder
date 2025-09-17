@@ -1,31 +1,42 @@
 "use strict";
 
-var _ref;
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var mongoose = require("mongoose");
 
-var userSchema = new mongoose.Schema((_ref = {
+var validator = require("validator");
+
+var userSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: true,
     minLength: 4,
-    maxLength: 50
+    maxLength: 50,
+    trim: true
   },
   lastName: {
-    type: String
+    type: String,
+    trim: true,
+    required: true
   },
   emailId: {
     type: String,
-    lowercase: true,
-    required: true,
+    required: [true, "Email is required"],
     unique: true,
-    trim: true
+    lowercase: true,
+    validate: function validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new Error("Invalid email" + value);
+      }
+    }
   },
   password: {
     type: String,
-    required: true
+    required: [true, "Password is required"],
+    minlength: [6, "Password must be at least 6 characters"],
+    validate: function validate(value) {
+      if (!validator.isStrongPassword(value)) {
+        throw new Error("Your password is weak.." + value);
+      }
+    }
   },
   age: {
     type: Number,
@@ -41,26 +52,22 @@ var userSchema = new mongoose.Schema((_ref = {
   },
   photoUrl: {
     type: String,
-    "default": "https://geographyandyou.com/images/user-profile.png"
+    "default": "https://geographyandyou.com/images/user-profile.png",
+    validate: function validate(value) {
+      if (!validator.isURL(value)) {
+        throw new Error("Invalid url" + value);
+      }
+    }
   },
   about: {
     type: String,
-    "default": "This is a default about of the user!"
+    "default": "This is a default about of the user!",
+    maxlength: [200, "About section cannot exceed 200 characters"]
   },
   skills: {
     type: [String]
   }
-}, _defineProperty(_ref, "lastName", {
-  type: String
-}), _defineProperty(_ref, "emailId", {
-  type: String
-}), _defineProperty(_ref, "password", {
-  type: String
-}), _defineProperty(_ref, "age", {
-  type: Number
-}), _defineProperty(_ref, "gender", {
-  type: String
-}), _ref), {
+}, {
   timestamps: true
 });
 var User = mongoose.model("user", userSchema);

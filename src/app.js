@@ -11,9 +11,13 @@ app.post("/signup", async (req, res) => {
 
   try {
     await user.save();
+    runValidators=true;
     res.send("User Added successfully!");
   } catch (err) {
-    res.status(400).send("Error saving the user:" + err.message);
+if (err.code === 11000) {
+      return res.status(400).send("Email already exists");
+    }
+    res.status(400).send("Error saving user: " + err.message);
   }
 });
 
@@ -65,10 +69,24 @@ app.delete("/user", async (req, res) => {
 });
 
 // Update data of the user
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params.userId;
   const data = req.body;
   try {
+    const ALLOWED_UPDATES=[
+        "photoUrl",
+        "about",
+        "gender",
+        "skills"
+    ]
+    const isUpdateAllowed=Object.keys(data).every((k)=> ALLOWED_UPDATES.includes(k)
+    );
+    if(!isUpdateAllowed){
+        throw new Error("Updates not allowed");
+    }
+    if(data.skills.length>10){
+        throw new Error("skills cannot be more than 10");
+    }
     const user = await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
       runValidators: true,
@@ -76,7 +94,7 @@ app.patch("/user", async (req, res) => {
     console.log(user);
     res.send("User updated successfully");
   } catch (err) {
-    res.status(400).send("Something went wrong ");
+   
     res.status(400).send("UPDATE FAILED:" + err.message);
   }
 });

@@ -22,21 +22,31 @@ app.post("/signup", function _callee(req, res) {
           return regeneratorRuntime.awrap(user.save());
 
         case 4:
+          runValidators = true;
           res.send("User Added successfully!");
-          _context.next = 10;
+          _context.next = 13;
           break;
 
-        case 7:
-          _context.prev = 7;
+        case 8:
+          _context.prev = 8;
           _context.t0 = _context["catch"](1);
-          res.status(400).send("Error saving the user:" + _context.t0.message);
 
-        case 10:
+          if (!(_context.t0.code === 11000)) {
+            _context.next = 12;
+            break;
+          }
+
+          return _context.abrupt("return", res.status(400).send("Email already exists"));
+
+        case 12:
+          res.status(400).send("Error saving user: " + _context.t0.message);
+
+        case 13:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[1, 7]]);
+  }, null, null, [[1, 8]]);
 }); // Get user by email
 
 app.get("/user", function _callee2(req, res) {
@@ -146,16 +156,37 @@ app["delete"]("/user", function _callee4(req, res) {
   }, null, null, [[1, 8]]);
 }); // Update data of the user
 
-app.patch("/user", function _callee5(req, res) {
-  var userId, data, user;
+app.patch("/user/:userId", function _callee5(req, res) {
+  var userId, data, ALLOWED_UPDATES, isUpdateAllowed, user;
   return regeneratorRuntime.async(function _callee5$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
         case 0:
-          userId = req.body.userId;
+          userId = req.params.userId;
           data = req.body;
           _context5.prev = 2;
-          _context5.next = 5;
+          ALLOWED_UPDATES = ["photoUrl", "about", "gender", "skills"];
+          isUpdateAllowed = Object.keys(data).every(function (k) {
+            return ALLOWED_UPDATES.includes(k);
+          });
+
+          if (isUpdateAllowed) {
+            _context5.next = 7;
+            break;
+          }
+
+          throw new Error("Updates not allowed");
+
+        case 7:
+          if (!(data.skills.length > 10)) {
+            _context5.next = 9;
+            break;
+          }
+
+          throw new Error("skills cannot be more than 10");
+
+        case 9:
+          _context5.next = 11;
           return regeneratorRuntime.awrap(User.findByIdAndUpdate({
             _id: userId
           }, data, {
@@ -163,25 +194,24 @@ app.patch("/user", function _callee5(req, res) {
             runValidators: true
           }));
 
-        case 5:
+        case 11:
           user = _context5.sent;
           console.log(user);
           res.send("User updated successfully");
-          _context5.next = 14;
+          _context5.next = 19;
           break;
 
-        case 10:
-          _context5.prev = 10;
+        case 16:
+          _context5.prev = 16;
           _context5.t0 = _context5["catch"](2);
-          res.status(400).send("Something went wrong ");
           res.status(400).send("UPDATE FAILED:" + _context5.t0.message);
 
-        case 14:
+        case 19:
         case "end":
           return _context5.stop();
       }
     }
-  }, null, null, [[2, 10]]);
+  }, null, null, [[2, 16]]);
 });
 connectDB().then(function () {
   console.log("Database connection established...");
