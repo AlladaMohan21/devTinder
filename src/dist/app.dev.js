@@ -13,7 +13,12 @@ var _require = require("./utils/validation"),
 
 var bcrypt = require("bcrypt");
 
+var cookieParser = require("cookie-parser");
+
+var jwt = require("jsonwebtoken");
+
 app.use(express.json());
+app.use(cookieParser());
 app.post("/signup", function _callee(req, res) {
   var _req$body, firstName, lastName, emailId, password, existingUser, validatePass, user;
 
@@ -86,7 +91,7 @@ app.post("/signup", function _callee(req, res) {
   }, null, null, [[12, 19]]);
 });
 app.post("/login", function _callee2(req, res) {
-  var _req$body2, emailId, password, user, isPasswordValid;
+  var _req$body2, emailId, password, user, isPasswordValid, token;
 
   return regeneratorRuntime.async(function _callee2$(_context2) {
     while (1) {
@@ -117,50 +122,115 @@ app.post("/login", function _callee2(req, res) {
           isPasswordValid = _context2.sent;
 
           if (!isPasswordValid) {
-            _context2.next = 14;
+            _context2.next = 18;
             break;
           }
 
+          _context2.next = 13;
+          return regeneratorRuntime.awrap(jwt.sign({
+            _id: user._id
+          }, "DEV@Tinder$123"));
+
+        case 13:
+          token = _context2.sent;
+          //add token to the cookie and send back the response
+          res.cookie("token", token);
           res.send("Login Successfull..");
-          _context2.next = 15;
+          _context2.next = 19;
           break;
 
-        case 14:
+        case 18:
           throw new error("Invalid Credentials");
 
-        case 15:
-          _context2.next = 20;
+        case 19:
+          _context2.next = 24;
           break;
 
-        case 17:
-          _context2.prev = 17;
+        case 21:
+          _context2.prev = 21;
           _context2.t0 = _context2["catch"](1);
           res.status(400).send("invalid Credentials " + _context2.t0.message);
 
-        case 20:
+        case 24:
         case "end":
           return _context2.stop();
       }
     }
-  }, null, null, [[1, 17]]);
-}); // Get user by email
+  }, null, null, [[1, 21]]);
+});
+app.get("/profile", function _callee3(req, res) {
+  var cookies, token, decodedMessage, _id, userId;
 
-app.get("/user", function _callee3(req, res) {
-  var userEmail, user;
   return regeneratorRuntime.async(function _callee3$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
+          cookies = req.cookies;
+          token = cookies.token; //validate my token 
+
+          if (token) {
+            _context3.next = 4;
+            break;
+          }
+
+          throw new Error("Invalid TOken");
+
+        case 4:
+          _context3.prev = 4;
+          _context3.next = 7;
+          return regeneratorRuntime.awrap(jwt.verify(token, "DEV@Tinder$123"));
+
+        case 7:
+          decodedMessage = _context3.sent;
+          _id = decodedMessage._id;
+          console.log("Logged In user is" + _id);
+          _context3.next = 12;
+          return regeneratorRuntime.awrap(User.findById(_id));
+
+        case 12:
+          userId = _context3.sent;
+
+          if (userId) {
+            _context3.next = 15;
+            break;
+          }
+
+          throw new Error("User Does Not Exists");
+
+        case 15:
+          res.send(userId);
+          _context3.next = 21;
+          break;
+
+        case 18:
+          _context3.prev = 18;
+          _context3.t0 = _context3["catch"](4);
+          res.status(400).send("Something went wrong ");
+
+        case 21:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  }, null, null, [[4, 18]]);
+}); // Get user by email
+
+app.get("/user", function _callee4(req, res) {
+  var userEmail, user;
+  return regeneratorRuntime.async(function _callee4$(_context4) {
+    while (1) {
+      switch (_context4.prev = _context4.next) {
+        case 0:
           userEmail = req.body.emailId;
-          _context3.prev = 1;
+          _context4.prev = 1;
           console.log(userEmail);
-          _context3.next = 5;
+          _context4.next = 5;
           return regeneratorRuntime.awrap(User.findOne({
             emailId: userEmail
           }));
 
         case 5:
-          user = _context3.sent;
+          user = _context4.sent;
 
           if (!user) {
             res.status(404).send("User not found");
@@ -174,100 +244,100 @@ app.get("/user", function _callee3(req, res) {
           // }
 
 
-          _context3.next = 12;
+          _context4.next = 12;
           break;
 
         case 9:
-          _context3.prev = 9;
-          _context3.t0 = _context3["catch"](1);
+          _context4.prev = 9;
+          _context4.t0 = _context4["catch"](1);
           res.status(400).send("Something went wrong ");
 
         case 12:
         case "end":
-          return _context3.stop();
+          return _context4.stop();
       }
     }
   }, null, null, [[1, 9]]);
 }); // Feed API - GET /feed - get all the users from the database
 
-app.get("/feed", function _callee4(req, res) {
+app.get("/feed", function _callee5(req, res) {
   var users;
-  return regeneratorRuntime.async(function _callee4$(_context4) {
+  return regeneratorRuntime.async(function _callee5$(_context5) {
     while (1) {
-      switch (_context4.prev = _context4.next) {
+      switch (_context5.prev = _context5.next) {
         case 0:
-          _context4.prev = 0;
-          _context4.next = 3;
+          _context5.prev = 0;
+          _context5.next = 3;
           return regeneratorRuntime.awrap(User.find({}));
 
         case 3:
-          users = _context4.sent;
+          users = _context5.sent;
           res.send(users);
-          _context4.next = 10;
+          _context5.next = 10;
           break;
 
         case 7:
-          _context4.prev = 7;
-          _context4.t0 = _context4["catch"](0);
+          _context5.prev = 7;
+          _context5.t0 = _context5["catch"](0);
           res.status(400).send("Something went wrong ");
 
         case 10:
         case "end":
-          return _context4.stop();
+          return _context5.stop();
       }
     }
   }, null, null, [[0, 7]]);
 }); // Detele a user from the database
 
-app["delete"]("/user", function _callee5(req, res) {
+app["delete"]("/user", function _callee6(req, res) {
   var userId, user;
-  return regeneratorRuntime.async(function _callee5$(_context5) {
+  return regeneratorRuntime.async(function _callee6$(_context6) {
     while (1) {
-      switch (_context5.prev = _context5.next) {
+      switch (_context6.prev = _context6.next) {
         case 0:
           userId = req.body.userId;
-          _context5.prev = 1;
-          _context5.next = 4;
+          _context6.prev = 1;
+          _context6.next = 4;
           return regeneratorRuntime.awrap(User.findByIdAndDelete({
             _id: userId
           }));
 
         case 4:
-          user = _context5.sent;
+          user = _context6.sent;
           //const user = await User.findByIdAndDelete(userId);
           res.send("User deleted successfully");
-          _context5.next = 11;
+          _context6.next = 11;
           break;
 
         case 8:
-          _context5.prev = 8;
-          _context5.t0 = _context5["catch"](1);
+          _context6.prev = 8;
+          _context6.t0 = _context6["catch"](1);
           res.status(400).send("Something went wrong ");
 
         case 11:
         case "end":
-          return _context5.stop();
+          return _context6.stop();
       }
     }
   }, null, null, [[1, 8]]);
 }); // Update data of the user
 
-app.patch("/user/:userId", function _callee6(req, res) {
+app.patch("/user/:userId", function _callee7(req, res) {
   var userId, data, ALLOWED_UPDATES, isUpdateAllowed, user;
-  return regeneratorRuntime.async(function _callee6$(_context6) {
+  return regeneratorRuntime.async(function _callee7$(_context7) {
     while (1) {
-      switch (_context6.prev = _context6.next) {
+      switch (_context7.prev = _context7.next) {
         case 0:
           userId = req.params.userId;
           data = req.body;
-          _context6.prev = 2;
+          _context7.prev = 2;
           ALLOWED_UPDATES = ["photoUrl", "about", "gender", "skills"];
           isUpdateAllowed = Object.keys(data).every(function (k) {
             return ALLOWED_UPDATES.includes(k);
           });
 
           if (isUpdateAllowed) {
-            _context6.next = 7;
+            _context7.next = 7;
             break;
           }
 
@@ -275,14 +345,14 @@ app.patch("/user/:userId", function _callee6(req, res) {
 
         case 7:
           if (!(data.skills.length > 10)) {
-            _context6.next = 9;
+            _context7.next = 9;
             break;
           }
 
           throw new Error("skills cannot be more than 10");
 
         case 9:
-          _context6.next = 11;
+          _context7.next = 11;
           return regeneratorRuntime.awrap(User.findByIdAndUpdate({
             _id: userId
           }, data, {
@@ -291,20 +361,20 @@ app.patch("/user/:userId", function _callee6(req, res) {
           }));
 
         case 11:
-          user = _context6.sent;
+          user = _context7.sent;
           console.log(user);
           res.send("User updated successfully");
-          _context6.next = 19;
+          _context7.next = 19;
           break;
 
         case 16:
-          _context6.prev = 16;
-          _context6.t0 = _context6["catch"](2);
-          res.status(400).send("UPDATE FAILED:" + _context6.t0.message);
+          _context7.prev = 16;
+          _context7.t0 = _context7["catch"](2);
+          res.status(400).send("UPDATE FAILED:" + _context7.t0.message);
 
         case 19:
         case "end":
-          return _context6.stop();
+          return _context7.stop();
       }
     }
   }, null, null, [[2, 16]]);
