@@ -10,6 +10,8 @@ var _require = require("../middlewares/auth"),
 var _require2 = require("../utils/validation"),
     validateEditProfileData = _require2.validateEditProfileData;
 
+var bcrypt = require("bcrypt");
+
 profileRouter.get("/profile/view", userAuth, function _callee(req, res) {
   var userId;
   return regeneratorRuntime.async(function _callee$(_context) {
@@ -72,6 +74,43 @@ profileRouter.patch("/profile/edit", userAuth, function _callee2(req, res) {
       }
     }
   }, null, null, [[0, 10]]);
+});
+profileRouter.patch("/profile/forgotpassword", userAuth, function _callee3(req, res) {
+  var password, loggedInUser, hashedPassword;
+  return regeneratorRuntime.async(function _callee3$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+          _context3.prev = 0;
+          password = req.body.password;
+          loggedInUser = req.user; // hash the new password
+
+          _context3.next = 5;
+          return regeneratorRuntime.awrap(bcrypt.hash(password, 10));
+
+        case 5:
+          hashedPassword = _context3.sent;
+          console.log(hashedPassword);
+          loggedInUser.password = hashedPassword;
+          _context3.next = 10;
+          return regeneratorRuntime.awrap(loggedInUser.save());
+
+        case 10:
+          res.send("Password updated successfully");
+          _context3.next = 16;
+          break;
+
+        case 13:
+          _context3.prev = 13;
+          _context3.t0 = _context3["catch"](0);
+          res.status(400).send("ERROR: " + _context3.t0.message);
+
+        case 16:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  }, null, null, [[0, 13]]);
 });
 module.exports = profileRouter;
 //# sourceMappingURL=profile.dev.js.map
