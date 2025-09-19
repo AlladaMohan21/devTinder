@@ -18,7 +18,16 @@ var validationDatabase = function validationDatabase(req) {
   }
 };
 
+var validateEditProfileData = function validateEditProfileData(req) {
+  var allowedEditFields = ["firstName", "lastName", "emailId", "photoUrl", "gender", "age", "about", "skills"];
+  var isEditAllowed = Object.keys(req.body).every(function (field) {
+    return allowedEditFields.includes(field);
+  });
+  return isEditAllowed;
+};
+
 module.exports = {
-  validationDatabase: validationDatabase
+  validationDatabase: validationDatabase,
+  validateEditProfileData: validateEditProfileData
 };
 //# sourceMappingURL=validation.dev.js.map
