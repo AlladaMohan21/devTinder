@@ -127,7 +127,7 @@ authRouter.post("/login", function _callee2(req, res) {
           res.cookie("token", token, {
             expires: new Date(Date.now() + 8 * 3600000)
           });
-          res.send("Login Successfull..");
+          res.send(user);
           _context2.next = 19;
           break;
 

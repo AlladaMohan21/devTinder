@@ -1,26 +1,28 @@
 "use strict";
 
-var _enum;
+var _fromUserId;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var mongoose = require("mongoose");
 
 var connectionRequestSchema = new mongoose.Schema({
-  fromUserId: {
+  fromUserId: (_fromUserId = {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
-  },
+    ref: "User"
+  }, _defineProperty(_fromUserId, "ref", "User"), _defineProperty(_fromUserId, "required", true), _fromUserId),
   toUserId: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true
   },
   status: {
     type: String,
     required: true,
-    "enum": (_enum = {
-      values: ["ignored", "interested", "accepeted", "rejected"]
-    }, _defineProperty(_enum, "values", ["ignored", "interested", "accepted", "rejected"]), _defineProperty(_enum, "message", "{VALUE} is incorrect status type"), _enum)
+    "enum": {
+      values: ["ignored", "interested", "accepted", "rejected"],
+      message: "{VALUE} is incorrect status type"
+    }
   }
 }, {
   timestamps: true

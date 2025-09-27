@@ -49,7 +49,7 @@ if(isPasswordValid){
     const token =await user.getJWT();
     //add token to the cookie and send back the response
     res.cookie("token",token,{expires:new Date(Date.now()+ 8* 3600000)});
-    res.send("Login Successfull..")
+    res.send(user);
 }else{
     throw new error("Invalid Credentials")
 }

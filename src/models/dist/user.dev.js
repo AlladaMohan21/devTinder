@@ -128,6 +128,6 @@ userSchema.methods.validatePassword = function _callee2(passwordInputUser) {
   }, null, this);
 };
 
-var User = mongoose.model("user", userSchema);
+var User = mongoose.model("User", userSchema);
 module.exports = User;
 //# sourceMappingURL=user.dev.js.map
